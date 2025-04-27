@@ -1,0 +1,47 @@
+{
+  "name": "tsfetch",
+  "version": "1.0.0",
+  "description": "",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "Vitalii Shevchuk",
+  "email": "vitshev120@gmail.com",
+  "license": "ISC",
+  "packageManager": "pnpm@10.9.0",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@semantic-release/git": "^10.0.1",
+    "@types/node": "^22.15.2",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "10.1.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "husky": "^9.1.7",
+    "lint-staged": "15.4.3",
+    "prettier": "^3.5.3",
+    "semantic-release": "24.2.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.27.0"
+  }
+}
