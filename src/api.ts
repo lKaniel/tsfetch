@@ -345,167 +345,40 @@ const api = {
             ...options,
         });
     },
-    /**
-     * Methods for sending requests without expecting a response (fire-and-forget)
-     */
-    sendOnly: {
-        /**
-         * Sends a POST request without expecting a response
-         * @param path - API endpoint path
-         * @param params - Path parameters to append to the URL
-         * @param body - Request body data
-         * @param query - Query parameters
-         * @param options - Additional request options
-         * @returns Promise that resolves when the request completes
-         */
-        post: ({
-            path,
-            params,
-            body,
-            query = {},
-            options = {},
-        }: {
-            path: string;
-            params?: string[];
-            body?: any;
-            query?: Record<string, any>;
-            options?: Omit<RequestOptions, "method" | "expectResponse">;
-        }): Promise<void> => {
-            return customFetch(path, {
-                method: "POST",
-                params,
-                query,
-                body,
-                expectResponse: false,
-                ...options,
-            });
-        },
-
-        /**
-         * Sends a PUT request without expecting a response
-         * @param path - API endpoint path
-         * @param params - Path parameters to append to the URL
-         * @param body - Request body data
-         * @param query - Query parameters
-         * @param options - Additional request options
-         * @returns Promise that resolves when the request completes
-         */
-        put: ({
-            path,
-            params,
-            body,
-            query = {},
-            options = {},
-        }: {
-            path: string;
-            params?: string[];
-            body?: any;
-            query?: Record<string, any>;
-            options?: Omit<RequestOptions, "method" | "expectResponse">;
-        }): Promise<void> => {
-            return customFetch(path, {
-                method: "PUT",
-                params,
-                query,
-                body,
-                expectResponse: false,
-                ...options,
-            });
-        },
-
-        /**
-         * Sends a PATCH request without expecting a response
-         * @param path - API endpoint path
-         * @param params - Path parameters to append to the URL
-         * @param body - Request body data
-         * @param query - Query parameters
-         * @param options - Additional request options
-         * @returns Promise that resolves when the request completes
-         */
-        patch: ({
-            path,
-            params,
-            body,
-            query = {},
-            options = {},
-        }: {
-            path: string;
-            params?: string[];
-            body?: any;
-            query?: Record<string, any>;
-            options?: Omit<RequestOptions, "method" | "expectResponse">;
-        }): Promise<void> => {
-            return customFetch(path, {
-                method: "PATCH",
-                params,
-                query,
-                body,
-                expectResponse: false,
-                ...options,
-            });
-        },
-
-        /**
-         * Sends a DELETE request without expecting a response
-         * @param path - API endpoint path
-         * @param params - Path parameters to append to the URL
-         * @param body - Request body data
-         * @param query - Query parameters
-         * @param options - Additional request options
-         * @returns Promise that resolves when the request completes
-         */
-        delete: ({
-            path,
-            params,
-            body,
-            query = {},
-            options = {},
-        }: {
-            path: string;
-            params?: string[];
-            body?: any;
-            query?: Record<string, any>;
-            options?: Omit<RequestOptions, "method" | "expectResponse">;
-        }): Promise<void> => {
-            return customFetch(path, {
-                method: "DELETE",
-                params,
-                query,
-                body,
-                expectResponse: false,
-                ...options,
-            });
-        },
-    },
 
     /**
-     * Downloads a file from the given URL
-     * @param url - URL of the file to download
-     * @param filename - Name to save the file as
-     * @param options - Additional request options
-     * @returns Promise that resolves when the download completes
+     * Methods for sending requests only from browser
      */
-    downloadFile: async ({
-        url,
-        filename,
-        options = {},
-    }: {
-        url: string;
-        filename: string;
-        options?: Omit<RequestOptions, "method">;
-    }): Promise<void> => {
-        const response = await fetch(url, options);
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
+    browserOnly: {
+        /**
+         * Downloads a file from the given URL
+         * @param url - URL of the file to download
+         * @param filename - Name to save the file as
+         * @param options - Additional request options
+         * @returns Promise that resolves when the download completes
+         */
+        downloadFile: async ({
+            url,
+            filename,
+            options = {},
+        }: {
+            url: string;
+            filename: string;
+            options?: Omit<RequestOptions, "method">;
+        }): Promise<void> => {
+            const response = await fetch(url, options);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
 
-        const link = document.createElement("a");
-        link.href = blobUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+        },
     },
 };
 
-export {api};
+export { api };
