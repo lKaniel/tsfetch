@@ -10,12 +10,20 @@ type RequestOptions = RequestInit & {
     body?: any;
     /** Whether to expect and process a response (defaults to true) */
     expectResponse?: boolean;
+    /** Full URL - if provided, it will override the path-based URL construction */
+    url?: string;
 };
 
 /**
  * Generic API response type
  */
 type ApiResponse<T> = Promise<T>;
+
+/**
+ * Middleware function type for request processing
+ * Takes the current request options and returns modified options
+ */
+export type ApiMiddleware = (options: RequestOptions) => RequestOptions | Promise<RequestOptions>;
 
 /**
  * API Client for making HTTP requests
@@ -54,10 +62,13 @@ class ApiClient {
             URL.revokeObjectURL(blobUrl);
         },
     };
+
     /** Base URL for API calls */
     private baseUrl: string;
     /** Authentication token */
     private token: string | null = null;
+    /** Array of middleware functions to process requests */
+    private middlewares: ApiMiddleware[] = [];
 
     /**
      * Creates a new API client instance
@@ -83,6 +94,16 @@ class ApiClient {
      */
     setBaseUrl(baseUrl: string): void {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+    }
+
+    /**
+     * Adds a middleware function to the client
+     * @param middleware - Middleware function to add
+     * @returns The client instance for chaining
+     */
+    use(middleware: ApiMiddleware): ApiClient {
+        this.middlewares.push(middleware);
+        return this;
     }
 
     /**
@@ -322,6 +343,21 @@ class ApiClient {
     }
 
     /**
+     * Apply all middleware functions to the request options
+     * @param options - The original request options
+     * @returns The modified request options after all middleware processing
+     */
+    private async applyMiddlewares(options: RequestOptions): Promise<RequestOptions> {
+        let processedOptions = { ...options };
+
+        for (const middleware of this.middlewares) {
+            processedOptions = await middleware(processedOptions);
+        }
+
+        return processedOptions;
+    }
+
+    /**
      * Performs an HTTP request with enhanced handling of different response types
      * @param path - API endpoint path
      * @param options - Request options including params, query, body, headers, etc.
@@ -334,11 +370,11 @@ class ApiClient {
             body,
             headers = {},
             expectResponse = true,
+            url: customUrl,
             ...fetchOptions
         } = options;
 
-        const url = this.buildUrl(path, params, query);
-
+        // Apply token and content-type headers
         const defaultHeaders: HeadersInit = {
             "Content-Type": "application/json",
         };
@@ -348,23 +384,59 @@ class ApiClient {
             defaultHeaders["Authorization"] = `Bearer ${this.token}`;
         }
 
-        const requestOptions: RequestInit = {
+        // Initial request options
+        let requestOptions: RequestOptions = {
             ...fetchOptions,
             headers: {
                 ...defaultHeaders,
                 ...headers,
             },
+            params,
+            query,
+            expectResponse,
         };
 
         if (body) {
-            requestOptions.body = JSON.stringify(body);
+            requestOptions.body = body;
+        }
+
+        // Apply middlewares
+        requestOptions = await this.applyMiddlewares(requestOptions);
+
+        // Extract processed options after middleware
+        const {
+            params: processedParams = [],
+            query: processedQuery = {},
+            body: processedBody,
+            headers: processedHeaders = {},
+            expectResponse: processedExpectResponse = true,
+            url: processedCustomUrl,
+            ...processedFetchOptions
+        } = requestOptions;
+
+        // Determine the URL (either custom URL from options/middleware or built URL)
+        const url =
+            processedCustomUrl || customUrl || this.buildUrl(path, processedParams, processedQuery);
+
+        // Prepare final fetch options
+        const finalRequestOptions: RequestInit = {
+            ...processedFetchOptions,
+            headers: processedHeaders,
+        };
+
+        // Process body if it hasn't been processed by middleware
+        if (processedBody !== undefined) {
+            finalRequestOptions.body =
+                typeof processedBody === "string" || processedBody instanceof FormData
+                    ? processedBody
+                    : JSON.stringify(processedBody);
         }
 
         try {
-            const response = await fetch(url, requestOptions);
+            const response = await fetch(url, finalRequestOptions);
 
             // If we don't expect a response, just check for errors and return
-            if (!expectResponse) {
+            if (!processedExpectResponse) {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -417,5 +489,16 @@ class ApiClient {
         }
     }
 }
+
+/**
+ * Next.js fetch middleware
+ * Adapts requests to work with Next.js fetch API
+ */
+export const nextFetchMiddleware: ApiMiddleware = (options) => {
+    // Clone options to avoid modifying the original
+    const nextOptions = { ...options };
+
+    return nextOptions;
+};
 
 export { ApiClient };
