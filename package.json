@@ -1,7 +1,7 @@
 {
   "name": "ts-rest-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "A flexible and powerful TypeScript HTTP client with middleware support for making API requests",
   "private": false,
   "type": "module",
   "main": "./dist/index.js",
@@ -18,13 +18,34 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "fetch",
+    "http",
+    "api",
+    "rest",
+    "client",
+    "typescript",
+    "middleware",
+    "nextjs",
+    "xhr",
+    "request"
+  ],
   "author": "Vitalii Shevchuk",
   "email": "vitshev120@gmail.com",
   "license": "ISC",
   "packageManager": "pnpm@10.9.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitaliishevchuk/tsfetch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vitaliishevchuk/tsfetch/issues"
+  },
+  "homepage": "https://github.com/vitaliishevchuk/tsfetch#readme",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@semantic-release/git": "^10.0.1",
