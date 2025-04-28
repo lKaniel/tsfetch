@@ -395,7 +395,7 @@ class ApiClient {
 
         // Add authorization header if token exists
         if (this.token) {
-            defaultHeaders["Authorization"] = `Bearer ${this.token}`;
+            defaultHeaders["Authorization"] = `${this.token}`;
         }
 
         // Initial request options
