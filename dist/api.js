@@ -326,14 +326,5 @@ class ApiClient {
         }
     }
 }
-/**
- * Next.js fetch middleware
- * Adapts requests to work with Next.js fetch API
- */
-export const nextFetchMiddleware = (options) => {
-    // Clone options to avoid modifying the original
-    // const nextOptions = { ...options };
-    return options;
-};
 export { ApiClient };
 //# sourceMappingURL=api.js.map
