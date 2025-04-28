@@ -496,9 +496,9 @@ class ApiClient {
  */
 export const nextFetchMiddleware: ApiMiddleware = (options) => {
     // Clone options to avoid modifying the original
-    const nextOptions = { ...options };
+    // const nextOptions = { ...options };
 
-    return nextOptions;
+    return options;
 };
 
 export { ApiClient };
