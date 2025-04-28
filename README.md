@@ -79,14 +79,14 @@ api.use((options) => {
 
 ## Next.js Integration
 
-TSFetch includes a middleware specifically for Next.js applications that enables cache handling with tags and revalidation:
+TSFetch includes a middleware specifically for Next.js applications that enables per-user cache handling with tags and revalidation:
 
 ```typescript
-import { ApiClient, nextFetchMiddleware } from 'ts-rest-api';
+import { ApiClient, nextJsPerUserCachingMiddleware } from 'ts-rest-api';
 
 // Create a client with Next.js support
 const api = new ApiClient('https://api.example.com');
-api.use(nextFetchMiddleware);
+api.use(nextJsPerUserCachingMiddleware);
 
 // Use with Next.js cache options
 const data = await api.get<UserData>({
@@ -107,7 +107,7 @@ const latestData = await api.get<UserData>({
 });
 ```
 
-The middleware automatically generates unique cache keys based on the URL and authentication token, ensuring proper cache invalidation when auth state changes.
+The middleware automatically generates unique cache keys based on the URL and authentication token, ensuring proper cache isolation between users and cache invalidation when auth state changes.
 
 ## API Methods
 
