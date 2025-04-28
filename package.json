@@ -40,12 +40,12 @@
   "packageManager": "pnpm@10.9.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vitaliishevchuk/tsfetch.git"
+    "url": "https://github.com/lKaniel/tsfetch.git"
   },
   "bugs": {
-    "url": "https://github.com/vitaliishevchuk/tsfetch/issues"
+    "url": "https://github.com/lKaniel/tsfetch/issues"
   },
-  "homepage": "https://github.com/vitaliishevchuk/tsfetch#readme",
+  "homepage": "https://github.com/lKaniel/tsfetch#readme",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@semantic-release/git": "^10.0.1",
