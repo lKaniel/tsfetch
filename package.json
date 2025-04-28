@@ -1,6 +1,6 @@
 {
   "name": "ts-rest-api",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "A flexible and powerful TypeScript HTTP client with middleware support for making API requests",
   "private": false,
   "type": "module",
