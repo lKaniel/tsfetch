@@ -1,4 +1,7 @@
-# TS rest api
+# ts-rest-api
+
+[![npm version](https://img.shields.io/npm/v/ts-rest-api.svg)](https://www.npmjs.com/package/ts-rest-api)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 A flexible and powerful HTTP client built with TypeScript that provides advanced features for making API requests with
 middleware support.
@@ -16,26 +19,29 @@ middleware support.
 ## Installation
 
 ```bash
-npm install @lkaniel/fetch
-# or
-yarn add @lkaniel/fetch
-# or
-pnpm add @lkaniel/fetch
+# npm
+npm install ts-rest-api
+
+# yarn
+yarn add ts-rest-api
+
+# pnpm
+pnpm add ts-rest-api
 ```
 
 ## Basic Usage
 
 ```typescript
-import {ApiClient} from '@lkaniel/fetch';
+import {ApiClient} from 'ts-rest-api';
 
 // Create a custom client instance with base URL and optional token
-const myApi = new ApiClient('https://api.example.com', 'initial-token');
+const api = new ApiClient('https://api.example.com', 'initial-token');
 
 // Later update token if needed
-myApi.setToken('updated-token');
+api.setToken('updated-token');
 
 // Make requests
-const response = await myApi.post<CreateUserResponse>({
+const response = await api.post<CreateUserResponse>({
     path: 'users',
     body: {name: 'John Doe', email: 'john@example.com'}
 });
@@ -46,7 +52,7 @@ const response = await myApi.post<CreateUserResponse>({
 TSFetch allows you to extend functionality through middleware:
 
 ```typescript
-import {ApiClient, ApiMiddleware} from '@lkaniel/fetch';
+import {ApiClient, ApiMiddleware} from 'ts-rest-api';
 
 // Create a custom middleware
 const loggingMiddleware: ApiMiddleware = (options) => {
@@ -76,7 +82,7 @@ api.use((options) => {
 TSFetch includes a middleware specifically for Next.js applications:
 
 ```typescript
-import {ApiClient, nextFetchMiddleware} from '@lkaniel/fetch';
+import {ApiClient, nextFetchMiddleware} from 'ts-rest-api';
 
 // Create a client with Next.js support
 const api = new ApiClient('https://api.example.com');
@@ -168,10 +174,15 @@ try {
 }
 ```
 
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 ## License
 
-ISC
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
 ## Author
 
-Vitalii Shevchuk
+[Vitalii Shevchuk](https://github.com/vitaliishevchuk)
+
