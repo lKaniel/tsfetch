@@ -458,15 +458,26 @@ class ApiClient {
             }
 
             if (!response.ok) {
-                const errorResponse: Record<string, string> = (await response.json()) as Record<
-                    string,
-                    string
-                >;
-                throw new Error(
-                    errorResponse.message
-                        ? errorResponse.message
-                        : `HTTP error! status: ${response.status}`
-                );
+                try {
+                    // Try to parse the error response as JSON
+                    const text = await response.text();
+                    if (text && text.trim()) {
+                        const errorResponse = JSON.parse(text) as Record<string, string>;
+                        throw new Error(
+                            errorResponse.message
+                                ? errorResponse.message
+                                : `HTTP error! status: ${response.status}`
+                        );
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                } catch (jsonError) {
+                    // If JSON parsing fails, just use the HTTP status
+                    if (jsonError instanceof SyntaxError) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    throw jsonError;
+                }
             }
 
             // Return null for 204 No Content
@@ -486,7 +497,12 @@ class ApiClient {
 
             // For JSON responses
             if (contentType?.includes("application/json")) {
-                const jsonData = await response.json();
+                const text = await response.text();
+                // Handle empty responses that would cause JSON.parse to fail
+                if (!text.trim()) {
+                    return null as T;
+                }
+                const jsonData = JSON.parse(text);
                 return jsonData as T; // Return the actual data, not the Response object
             }
 
@@ -496,7 +512,17 @@ class ApiClient {
             }
 
             // Default to JSON if content-type is not specified
-            return response.json() as Promise<T>;
+            try {
+                const text = await response.text();
+                // Handle empty responses that would cause JSON.parse to fail
+                if (!text.trim()) {
+                    return null as T;
+                }
+                return JSON.parse(text) as T;
+            } catch (e) {
+                console.warn("Failed to parse response as JSON:", e);
+                return null as T;
+            }
         } catch (error) {
             console.error("API request failed:", error);
             throw error;
