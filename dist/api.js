@@ -1,3 +1,4 @@
+import { ApiError } from './errors.js';
 /**
  * API Client for making HTTP requests
  */
@@ -287,31 +288,57 @@ class ApiClient {
             // If we don't expect a response, just check for errors and return
             if (!processedExpectResponse) {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new ApiError({
+                        message: `HTTP error! status: ${response.status}`,
+                        type: 'HTTP_ERROR',
+                        status: response.status,
+                        statusText: response.statusText,
+                        request: { url, method: finalRequestOptions.method || 'GET' },
+                    });
                 }
                 return null; // Return void for no-response requests
             }
             if (!response.ok) {
-                try {
-                    // Try to parse the error response as JSON
-                    const text = await response.text();
-                    if (text && text.trim()) {
-                        const errorResponse = JSON.parse(text);
-                        throw new Error(errorResponse.message
-                            ? errorResponse.message
-                            : `HTTP error! status: ${response.status}`);
+                const responseText = await response.text();
+                let message = `HTTP error! status: ${response.status}`;
+                let code;
+                let responseData;
+                if (responseText && responseText.trim()) {
+                    try {
+                        const parsed = JSON.parse(responseText);
+                        responseData = parsed;
+                        // Extract message from various common formats
+                        if (typeof parsed.message === 'string') {
+                            message = parsed.message;
+                        }
+                        else if (typeof parsed.error === 'string') {
+                            message = parsed.error;
+                        }
+                        // Extract error code from various common formats
+                        if (parsed.code !== undefined) {
+                            code = parsed.code;
+                        }
+                        else if (parsed.errorCode !== undefined) {
+                            code = parsed.errorCode;
+                        }
+                        else if (parsed.error_code !== undefined) {
+                            code = parsed.error_code;
+                        }
                     }
-                    else {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                    catch {
+                        // Response is not JSON, keep it as responseText only
                     }
                 }
-                catch (jsonError) {
-                    // If JSON parsing fails, just use the HTTP status
-                    if (jsonError instanceof SyntaxError) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    throw jsonError;
-                }
+                throw new ApiError({
+                    message,
+                    type: 'HTTP_ERROR',
+                    status: response.status,
+                    statusText: response.statusText,
+                    code,
+                    responseText: responseText || undefined,
+                    responseData,
+                    request: { url, method: finalRequestOptions.method || 'GET' },
+                });
             }
             // Return null for 204 No Content
             if (response.status === 204) {
@@ -353,8 +380,15 @@ class ApiClient {
             }
         }
         catch (error) {
-            console.error("API request failed:", error);
-            throw error;
+            if (ApiError.isApiError(error)) {
+                throw error;
+            }
+            throw new ApiError({
+                message: error instanceof Error ? error.message : 'Network request failed',
+                type: 'NETWORK_ERROR',
+                request: { url, method: finalRequestOptions.method || 'GET' },
+                cause: error instanceof Error ? error : undefined,
+            });
         }
     }
 }
